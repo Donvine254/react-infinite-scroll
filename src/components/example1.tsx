@@ -1,7 +1,9 @@
+/*Use vanilla react with intersection observer and custom hook */
 import { useState, useRef, useCallback } from "react";
 import usePosts from "../hooks/use-posts";
 import type { Post } from "../types";
 import { PostCard } from "./postcard";
+import { Loader2 } from "lucide-react";
 
 const Example1 = () => {
   const [pageNum, setPageNum] = useState(1);
@@ -37,14 +39,26 @@ const Example1 = () => {
   });
 
   return (
-    <>
-      <h1 id="top">∞ Infinite Scroll – Example 1</h1>
-      {content}
-      {isLoading && <p className="center">Loading More Posts...</p>}
-      <p className="center">
-        <a href="#top">Back to Top</a>
-      </p>
-    </>
+    <div className="container mx-auto px-4 py-16">
+      <h1
+        id="top"
+        className="text-2xl font-bold text-gray-900 mb-4 text-center">
+        React Infinite Scroll – Example 1
+      </h1>
+      <div className="grid grid-cols-1  gap-6"> {content}</div>
+
+      {isLoading && (
+        <div className="flex items-center space-x-2 py-2 justify-center">
+          <Loader2 className="size-4 animate-spin" />{" "}
+          <span>Loading More Posts..</span>
+        </div>
+      )}
+      <div className="text-center py-2">
+        <a href="#top" className="hover:text-blue-500 hover:underline">
+          ↑ Back to Top
+        </a>
+      </div>
+    </div>
   );
 };
 

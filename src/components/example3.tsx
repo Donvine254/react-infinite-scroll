@@ -1,13 +1,14 @@
-/*Use infinite-query with intersection observer */
+/*Use infinite-query with react-intersection-observer */
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useRef, useCallback } from "react";
-
-import { Loader2 } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 import type { Post } from "../types";
 import { getPostsPage } from "../api/posts";
 import { PostCard } from "./postcard";
+import { Loader2 } from "lucide-react";
 
-const Example2 = () => {
+const Example3 = () => {
+  const { ref, inView } = useInView();
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery<Post[]>({
       queryKey: ["posts"],
@@ -17,24 +18,10 @@ const Example2 = () => {
       initialPageParam: 1,
     });
 
-  const intObserver = useRef<IntersectionObserver | null>(null);
-
-  const lastPostRef = useCallback(
-    (post: HTMLElement | null) => {
-      if (isFetchingNextPage) return;
-
-      if (intObserver.current) intObserver.current.disconnect();
-
-      intObserver.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasNextPage) {
-          fetchNextPage();
-        }
-      });
-
-      if (post) intObserver.current.observe(post);
-    },
-    [isFetchingNextPage, fetchNextPage, hasNextPage]
-  );
+  // Trigger fetch when last card is visible
+  if (inView && hasNextPage && !isFetchingNextPage) {
+    fetchNextPage();
+  }
 
   const content = data?.pages.flatMap((pg, pageIndex) =>
     pg.map((post, i, arr) => {
@@ -46,7 +33,7 @@ const Example2 = () => {
         <PostCard
           key={post.id}
           post={post}
-          ref={isLastCard ? lastPostRef : undefined}
+          ref={isLastCard ? ref : undefined}
         />
       );
     })
@@ -57,7 +44,7 @@ const Example2 = () => {
       <h1
         id="top"
         className="text-2xl font-bold text-gray-900 mb-4 text-center">
-        React Infinite Scroll – Example 2
+        React Infinite Scroll – Example 3
       </h1>
       <div className="grid grid-cols-1  gap-6"> {content}</div>
 
@@ -76,4 +63,4 @@ const Example2 = () => {
   );
 };
 
-export default Example2;
+export default Example3;
